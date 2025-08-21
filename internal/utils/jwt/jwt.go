@@ -33,7 +33,7 @@ type TokenManager struct {
 }
 
 type Claims struct {
-	UserID uint   `json:"user_id"`
+	UserID string `json:"user_id"`
 	Email  string `json:"email"`
 	jwt.RegisteredClaims
 }
@@ -66,7 +66,7 @@ func (tm *TokenManager) GenerateTokenPair(user *entities.User) (map[TokenType]st
 	// Store refresh token in Redis
 	err = tm.redis.Set(
 		context.Background(),
-		fmt.Sprintf(refreshTokenPrefix, user.ID),
+		fmt.Sprintf("%s%s", refreshTokenPrefix, user.ID),
 		refreshToken,
 		time.Until(refreshClaims.ExpiresAt.Time),
 	).Err()
@@ -78,7 +78,7 @@ func (tm *TokenManager) GenerateTokenPair(user *entities.User) (map[TokenType]st
 	// Store access token in Redis with shorter TTL
 	err = tm.redis.Set(
 		context.Background(),
-		fmt.Sprintf(accessTokenPrefix, user.ID),
+		fmt.Sprintf("%s%s", accessTokenPrefix, user.ID),
 		accessToken,
 		time.Until(accessClaims.ExpiresAt.Time),
 	).Err()
@@ -133,7 +133,7 @@ func (tm *TokenManager) isTokenBlacklisted(tokenString string) (bool, error) {
 func (tm *TokenManager) verifyRefreshTokenInRedis(claims *Claims, tokenString string) error {
 	tokenInRedis, err := tm.redis.Get(
 		context.Background(),
-		fmt.Sprintf(refreshTokenPrefix, claims.UserID),
+		fmt.Sprintf("%s%s", refreshTokenPrefix, claims.UserID),
 	).Result()
 
 	if err != nil || tokenInRedis != tokenString {
@@ -185,21 +185,21 @@ func (tm *TokenManager) ValidateToken(tokenString string, tokenType TokenType) (
 }
 
 // Logout invalidates all tokens for a user
-func (tm *TokenManager) Logout(userID uint) error {
+func (tm *TokenManager) Logout(userID string) error {
 	ctx := context.Background()
 	
 	// Get the refresh token before deleting it
-	refreshToken, err := tm.redis.Get(ctx, fmt.Sprintf(refreshTokenPrefix, userID)).Result()
+	refreshToken, err := tm.redis.Get(ctx, refreshTokenPrefix + userID).Result()
 	if err == nil {
 		// Add refresh token to blacklist
-		tm.redis.Set(ctx, fmt.Sprintf(blacklistPrefix, refreshToken), "1", tm.config.RefreshExpiration)
+		tm.redis.Set(ctx, blacklistPrefix + refreshToken, "1", tm.config.RefreshExpiration)
 	}
 
 	// Delete all tokens for this user
 	_, err = tm.redis.Del(
 		ctx,
-		fmt.Sprintf(refreshTokenPrefix, userID),
-		fmt.Sprintf(accessTokenPrefix, userID),
+		refreshTokenPrefix + userID,
+		accessTokenPrefix + userID,
 	).Result()
 
 	return err
@@ -210,7 +210,7 @@ func (tm *TokenManager) InvalidateToken(tokenString string, tokenType TokenType,
 	// Add token to blacklist
 	return tm.redis.Set(
 		context.Background(),
-		fmt.Sprintf(blacklistPrefix, tokenString),
+		blacklistPrefix + tokenString,
 		"1",
 		expiration,
 	).Err()

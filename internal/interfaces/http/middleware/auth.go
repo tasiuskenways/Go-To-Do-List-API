@@ -47,10 +47,10 @@ func AuthMiddleware(jwtManager *jwt.TokenManager) fiber.Handler {
 }
 
 // GetUserIDFromContext gets the user ID from the context
-func GetUserIDFromContext(c *fiber.Ctx) (uint, error) {
-	userID, ok := c.Locals("userID").(uint)
+func GetUserIDFromContext(c *fiber.Ctx) (string, error) {
+	userID, ok := c.Locals("userID").(string)
 	if !ok {
-		return 0, errors.New("user ID not found in context")
+		return "", errors.New("user ID not found in context")
 	}
 	return userID, nil
 }

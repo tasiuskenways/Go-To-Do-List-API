@@ -26,11 +26,14 @@ func HashPassword(password string) (string, error) {
 
 // CheckPassword compares a plaintext password with a hashed password
 func CheckPassword(password, hashedPassword string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
-	if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-		return fmt.Errorf("invalid password")
-	}
-	return err
+    err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+    if err != nil {
+        if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+            return fmt.Errorf("invalid password")
+        }
+        return fmt.Errorf("password comparison failed: %w", err)
+    }
+    return nil
 }
 
 // GenerateRandomString generates a random string of the given length

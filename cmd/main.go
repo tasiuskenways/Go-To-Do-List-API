@@ -9,7 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"tasius.my.id/todolistapi/internal/config"
 	"tasius.my.id/todolistapi/internal/infrastructure/db"
-	"tasius.my.id/todolistapi/internal/interfaces/routes"
+	"tasius.my.id/todolistapi/internal/interfaces/http/routes"
 	"tasius.my.id/todolistapi/internal/utils/jwt"
 )
 

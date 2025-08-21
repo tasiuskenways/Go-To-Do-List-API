@@ -1,0 +1,21 @@
+package routes
+
+import (
+	"github.com/gofiber/fiber/v2"
+	"tasius.my.id/todolistapi/internal/application/services"
+	"tasius.my.id/todolistapi/internal/infrastructure/repositories"
+	"tasius.my.id/todolistapi/internal/interfaces/http/handlers"
+	"tasius.my.id/todolistapi/internal/interfaces/http/middleware"
+)
+
+func SetupAuthRoutes(api fiber.Router, deps RoutesDependencies) {
+
+	userRepo := repositories.NewUserRepository(deps.Db)
+	authService := services.NewAuthService(userRepo, deps.RedisClient, &deps.Config.JWT, deps.JWTManager)
+	authHandler := handlers.NewAuthHandler(authService)
+
+	auth := api.Group("/auth", middleware.DecryptMiddleware(deps.Config.HybridEncryption.PrivateKeyPath))
+	auth.Post("/register", authHandler.Register)
+	auth.Post("/login", authHandler.Login)
+	auth.Post("/refresh", authHandler.RefreshToken)
+}

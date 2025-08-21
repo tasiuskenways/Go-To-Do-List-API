@@ -7,7 +7,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 	"tasius.my.id/todolistapi/internal/config"
-	"tasius.my.id/todolistapi/internal/middleware"
+	"tasius.my.id/todolistapi/internal/interfaces/http/middleware"
 	"tasius.my.id/todolistapi/internal/utils"
 	"tasius.my.id/todolistapi/internal/utils/jwt"
 )

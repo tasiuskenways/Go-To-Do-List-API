@@ -3,11 +3,12 @@ package entities
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type User struct {
-	ID        uint           `json:"id" gorm:"primaryKey"`
+	ID        string         `json:"id" gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
 	Email     string         `json:"email" gorm:"unique;not null"`
 	Password  string         `json:"-" gorm:"not null"`
 	Name      string         `json:"name" gorm:"not null"`
@@ -23,7 +24,10 @@ func (User) TableName() string {
 
 // BeforeCreate hook to set default values
 func (u *User) BeforeCreate(tx *gorm.DB) error {
-	if u.IsActive == false {
+	if u.ID == "" {
+		u.ID = uuid.NewString()
+	}
+	if !u.IsActive {
 		u.IsActive = true
 	}
 	return nil
