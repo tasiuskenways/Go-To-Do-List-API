@@ -1,0 +1,23 @@
+version: 1.56.2
+
+linters:
+  enable:
+    - errcheck
+    - goimports
+    - govet
+    - staticcheck
+    - unused
+    - gosec
+    - misspell
+
+linters-settings:
+  goimports:
+    local-prefixes: github.com/tasiuskenways
+  gosec:
+    excludes:
+      - G104 # Errors unhandled
+      - G402 # TLS InsecureSkipVerify set true
+  govet:
+    check-shadowing: true
+  misspell:
+    locale: US
