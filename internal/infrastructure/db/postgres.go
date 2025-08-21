@@ -10,7 +10,24 @@ import (
 	"tasius.my.id/todolistapi/internal/config"
 )
 
+// NewPostgresConnection creates a new database connection and runs migrations
 func NewPostgresConnection(cfg *config.Config) (*gorm.DB, error) {
+	db, err := ConnectWithoutMigration(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	// Run migrations
+	if err := Migrate(db); err != nil {
+		return nil, fmt.Errorf("failed to migrate database: %w", err)
+	}
+
+	log.Println("Database connected and migrated successfully")
+	return db, nil
+}
+
+// ConnectWithoutMigration creates a new database connection without running migrations
+func ConnectWithoutMigration(cfg *config.Config) (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=UTC",
 		cfg.Database.Host,
@@ -35,12 +52,7 @@ func NewPostgresConnection(cfg *config.Config) (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	// Auto migrate the schema
-	if err := Migrate(db); err != nil {
-		return nil, fmt.Errorf("failed to migrate database: %w", err)
-	}
-
-	log.Println("Database connected and migrated successfully")
+	log.Println("Database connected successfully")
 	return db, nil
 }
 

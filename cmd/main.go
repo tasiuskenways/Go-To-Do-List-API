@@ -17,7 +17,8 @@ func main()  {
 
 	cfg := config.Load()
 
-	postgres, err := db.NewPostgresConnection(cfg)
+	// Connect to database without running migrations
+	postgres, err := db.ConnectWithoutMigration(cfg)
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
