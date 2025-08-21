@@ -63,19 +63,11 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 }
 
 func (h *AuthHandler) Logout(c *fiber.Ctx) error {
-	// Extract token from header
-	// authHeader := c.Get("Authorization")
-	// token, err := utils.ExtractTokenFromHeader(authHeader)
-	// if err != nil {
-	// 	return utils.ErrorResponse(c, fiber.StatusUnauthorized, err.Error())
-	// }
+	if err := h.authService.Logout(c); err != nil {
+		return utils.ErrorResponse(c, fiber.StatusInternalServerError, err.Error())
+	}
 
-	// // Logout user
-	// if err := h.authService.Logout(c.Context(), token); err != nil {
-	// 	return utils.ErrorResponse(c, fiber.StatusBadRequest, err.Error())
-	// }
-
-	return utils.SuccessResponse(c, "Logout successful", nil)
+	return utils.SuccessResponse(c, "Successfully logged out", nil)
 }
 
 func (h *AuthHandler) RefreshToken(c *fiber.Ctx) error {

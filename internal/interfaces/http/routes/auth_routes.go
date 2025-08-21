@@ -18,4 +18,7 @@ func SetupAuthRoutes(api fiber.Router, deps RoutesDependencies) {
 	auth.Post("/register", authHandler.Register)
 	auth.Post("/login", authHandler.Login)
 	auth.Post("/refresh", authHandler.RefreshToken)
+
+	authProtected := api.Group("/auth", middleware.AuthMiddleware(deps.JWTManager))
+	authProtected.Post("/logout", authHandler.Logout)
 }
