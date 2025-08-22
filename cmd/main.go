@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"tasius.my.id/todolistapi/internal/config"
 	"tasius.my.id/todolistapi/internal/infrastructure/db"
 	"tasius.my.id/todolistapi/internal/interfaces/http/routes"
@@ -47,7 +48,12 @@ func main()  {
 		},
 	})
 
-	app.Use(logger.New())
+	app.Use(requestid.New())
+
+	app.Use(logger.New(logger.Config{
+		Format: "------------------------\n Time: ${time}\n Status: ${status}\n Latency: ${latency}\n IP: ${ip}\n Method: ${method}\n Path: ${path} \n RequestId: ${locals:requestid}\n------------------------\n",
+	}))
+
 	app.Use(recover.New())
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",

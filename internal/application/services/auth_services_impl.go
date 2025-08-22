@@ -140,10 +140,10 @@ func (s *authService) generateAuthResponse(user *entities.User) (*dto.AuthRespon
 	}
 
 	return &dto.AuthResponse{
-		User:         dto.NewUserResponse(user),
+		User:         dto.NewUserResponse(user),	
 		AccessToken:  tokens[jwt.AccessToken],
 		RefreshToken: tokens[jwt.RefreshToken],
 		TokenType:    "Bearer",
-		ExpiresIn:    15 * 60, // 15 minutes in seconds
+		ExpiresIn:    s.jwtConfig.Expiration.Milliseconds(),
 	}, nil
 }
