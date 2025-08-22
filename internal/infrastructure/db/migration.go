@@ -23,5 +23,6 @@ func Migrate(db *gorm.DB) error {
 	// Create tables with new schema
 	return db.AutoMigrate(
 		&entities.User{},
+		&entities.Todo{},
 	)
 }

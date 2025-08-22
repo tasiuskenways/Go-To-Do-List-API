@@ -40,4 +40,5 @@ func SetupRoutes(app *fiber.App, deps RoutesDependencies)  {
 	}
 
 	SetupAuthRoutes(api, deps)
+	SetupTodoRoutes(api, deps)
 }
